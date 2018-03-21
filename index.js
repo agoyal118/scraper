@@ -1,16 +1,29 @@
 var request = require('request');
 var cheerio = require('cheerio');
 
-var url = 'https://webpoint.usaweightlifting.org/wp15/Events2/Events.wp?evt_CategoryID=12';
+var baseURL = 'https://webpoint.usaweightlifting.org';
+var homeURL = 'https://webpoint.usaweightlifting.org/wp15/Events2/Events.wp?evt_CategoryID=12';
+var urlList = [];
+var name_and_email = [];
+var testURL = 'https://webpoint.usaweightlifting.org/wp15/Events2/ViewEvt.wp?EventID=137709';
 
-request(url, function(err, response, html) {
+request(homeURL, function(err, response, html) {
 	if(!err) {
 		var $ = cheerio.load(html);
 		var allItems = $('div.ilb.vt.push-60.pad-5');
-		var items = [];
 		allItems.each(function(index) {
-			items.push($('div.ilb.vt.push-60.pad-5').eq(index).find('a').attr('href'));
+			urlList.push(baseURL + $('div.ilb.vt.push-60.pad-5').eq(index).find('a').attr('href'));
 		});
-		console.log(items);
+		console.log(urlList);
 	}
-})
+});
+
+
+request(testURL, function(err, response, html) {
+	if (!err) {
+		var $ = cheerio.load(html);
+		var name = $("td.mfff:contains('Coordinator:')").siblings().text();
+		var email = $("td.mfff:contains('Email:')").siblings().text();
+		console.log(name, email);
+	}
+});
